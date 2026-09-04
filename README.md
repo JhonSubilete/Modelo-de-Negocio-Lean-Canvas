@@ -1,6 +1,6 @@
 # Canvas de Negocio
 
-Generador de Business Model Canvas en español, listo para GitHub Pages. Funciona sin servidor, base de datos ni dependencias externas de JavaScript.
+Generador de Business Model Canvas en español, listo para GitHub Pages. Su identidad visual toma como referencia la paleta azul, verde lima, celeste, rosa y amarillo de COFIDE Conecta+. Funciona sin servidor, base de datos ni dependencias externas de JavaScript.
 
 ## Funciones
 
