@@ -9,9 +9,11 @@ Generador de Business Model Canvas en español, listo para GitHub Pages. Su iden
 - Alternativa táctil para mover notas desde celulares y tabletas.
 - Guardado automático en el navegador.
 - Carga local de logotipo de hasta 2 MB.
-- Modo color y monocromo.
+- Modos color y monocromo mediante controles visuales compactos.
 - Importación y exportación del proyecto en JSON.
-- Exportación a PDF mediante el diálogo de impresión.
+- Exportación del canvas a PDF o imagen PNG.
+- Botón para compartir la herramienta por WhatsApp.
+- Recorrido simplificado con nueve preguntas prácticas para aterrizar una idea de negocio.
 - Diseño responsive y navegación accesible por teclado.
 
 ## Publicar en GitHub Pages
