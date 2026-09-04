@@ -20,7 +20,7 @@
       </a>
 
       <nav class="site-nav" aria-label="Navegación principal">
-        <a href="#componentes">Componentes</a>
+        <a href="#componentes">Cómo funciona</a>
         <a href="#guia">Guía</a>
         <a href="#preguntas">Preguntas</a>
         <a class="nav-action" href="#generador">Crear mi canvas</a>
@@ -30,13 +30,11 @@
     <main>
       <section class="workspace-section" id="generador" aria-labelledby="page-title">
         <div class="workspace-heading">
-          <div>
+          <div class="hero-copy">
             <p class="eyebrow">Herramienta para emprendedores</p>
-            <h1 id="page-title">Construye tu modelo de negocio, paso a paso</h1>
-            <p>
-              Ordena tus ideas, conecta las decisiones clave y convierte tu propuesta en un
-              modelo que puedas explicar, validar y mejorar.
-            </p>
+            <h1 id="page-title">¿Tienes mil ideas dando vueltas en tu cabeza?</h1>
+            <p>Empieza hoy una y aterrízala en minutos</p>
+            <a class="hero-cta" href="#canvasEditor">Aterrizar ahora <span aria-hidden="true">→</span></a>
           </div>
           <div class="completion" aria-live="polite">
             <span class="completion-value" id="completionValue">0/9</span>
@@ -47,16 +45,14 @@
           </div>
         </div>
 
-        <div class="app-shell">
+        <div class="app-shell" id="canvasEditor">
           <div class="toolbar" aria-label="Controles del lienzo">
             <div class="toolbar-group mode-control" role="group" aria-label="Estilo del lienzo">
-              <button class="mode-button is-active" id="colorMode" type="button" aria-pressed="true">
+              <button class="mode-button is-active" id="colorMode" type="button" aria-pressed="true" aria-label="Usar versión a color" title="Color">
                 <span class="color-dot" aria-hidden="true"></span>
-                Color
               </button>
-              <button class="mode-button" id="monoMode" type="button" aria-pressed="false">
+              <button class="mode-button" id="monoMode" type="button" aria-pressed="false" aria-label="Usar versión monocroma" title="Monocromo">
                 <span class="mono-dot" aria-hidden="true"></span>
-                Monocromo
               </button>
             </div>
 
@@ -70,10 +66,23 @@
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3m0 12 4-4m-4 4-4-4M5 16v5h14v-5" /></svg>
                 Guardar archivo
               </button>
-              <button class="button button-primary" id="printButton" type="button">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V3h10v5M7 17H4V9h16v8h-3m-10-4h10v8H7z" /></svg>
-                Exportar PDF
-              </button>
+              <div class="export-control">
+                <button class="button button-primary" id="exportToggle" type="button" aria-expanded="false" aria-controls="exportMenu">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3m0 12 4-4m-4 4-4-4M5 16v5h14v-5" /></svg>
+                  Exportar
+                  <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 10 4 4 4-4" /></svg>
+                </button>
+                <div class="export-menu" id="exportMenu" hidden>
+                  <button id="printButton" type="button">
+                    <span class="export-icon" aria-hidden="true">PDF</span>
+                    <span><strong>Documento PDF</strong><small>Listo para imprimir o enviar</small></span>
+                  </button>
+                  <button id="pngButton" type="button">
+                    <span class="export-icon" aria-hidden="true">PNG</span>
+                    <span><strong>Imagen PNG</strong><small>Descarga el canvas como imagen</small></span>
+                  </button>
+                </div>
+              </div>
               <button class="icon-button danger-action" id="resetButton" type="button" aria-label="Borrar todo el lienzo" title="Borrar todo">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m3 0-1 14H7L6 7m4 4v6m4-6v6" /></svg>
               </button>
@@ -94,7 +103,7 @@
             </div>
 
             <label class="field">
-              <span>Idea de negocio</span>
+              <span>Idea de Negocio</span>
               <input id="businessName" type="text" maxlength="80" placeholder="Ej. Café Horizonte" autocomplete="organization" />
             </label>
             <label class="field">
@@ -109,121 +118,94 @@
 
           <div class="canvas-scroll" tabindex="0" aria-label="Lienzo de modelo de negocio; desliza horizontalmente si es necesario">
             <div class="canvas-grid" id="canvasGrid">
-              <article class="canvas-block block-partners" data-key="partners" data-index="01">
+              <article class="canvas-block block-segments" data-key="segments" data-index="01">
                 <header class="block-header">
                   <span class="block-number">01</span>
-                  <div><h2>Socios clave</h2><p>La red que hace posible el modelo.</p></div>
+                  <div><h2>Segmentos de clientes</h2></div>
                 </header>
-                <ul class="block-prompts">
-                  <li>¿Quiénes son nuestros aliados y proveedores esenciales?</li>
-                  <li>¿Qué recursos o actividades obtenemos de ellos?</li>
-                </ul>
-                <div class="notes-list" data-notes="partners"></div>
-                <button class="add-note" type="button" data-add="partners"><span aria-hidden="true">＋</span>Añadir nota</button>
-              </article>
-
-              <article class="canvas-block block-activities" data-key="activities" data-index="02">
-                <header class="block-header">
-                  <span class="block-number">02</span>
-                  <div><h2>Actividades clave</h2><p>Lo que debemos hacer especialmente bien.</p></div>
-                </header>
-                <ul class="block-prompts">
-                  <li>¿Qué actividades exige nuestra propuesta de valor?</li>
-                  <li>¿Cuáles sostienen los canales y las relaciones?</li>
-                </ul>
-                <div class="notes-list" data-notes="activities"></div>
-                <button class="add-note" type="button" data-add="activities"><span aria-hidden="true">＋</span>Añadir nota</button>
-              </article>
-
-              <article class="canvas-block block-resources" data-key="resources" data-index="03">
-                <header class="block-header">
-                  <span class="block-number">03</span>
-                  <div><h2>Recursos clave</h2><p>Los activos imprescindibles.</p></div>
-                </header>
-                <ul class="block-prompts">
-                  <li>¿Qué recursos físicos, humanos, intelectuales o financieros necesitamos?</li>
-                  <li>¿Cuáles son difíciles de sustituir?</li>
-                </ul>
-                <div class="notes-list" data-notes="resources"></div>
-                <button class="add-note" type="button" data-add="resources"><span aria-hidden="true">＋</span>Añadir nota</button>
-              </article>
-
-              <article class="canvas-block block-value" data-key="value" data-index="04">
-                <header class="block-header">
-                  <span class="block-number">04</span>
-                  <div><h2>Propuesta de valor</h2><p>La razón concreta por la que nos eligen.</p></div>
-                </header>
-                <ul class="block-prompts">
-                  <li>¿Qué problema resolvemos o qué necesidad atendemos?</li>
-                  <li>¿Qué beneficio nos vuelve relevantes y diferentes?</li>
-                </ul>
-                <div class="notes-list" data-notes="value"></div>
-                <button class="add-note" type="button" data-add="value"><span aria-hidden="true">＋</span>Añadir nota</button>
-              </article>
-
-              <article class="canvas-block block-relationships" data-key="relationships" data-index="05">
-                <header class="block-header">
-                  <span class="block-number">05</span>
-                  <div><h2>Relaciones con clientes</h2><p>Cómo adquirimos, atendemos y fidelizamos.</p></div>
-                </header>
-                <ul class="block-prompts">
-                  <li>¿Qué relación espera cada segmento?</li>
-                  <li>¿Cómo se integra y cuánto cuesta mantenerla?</li>
-                </ul>
-                <div class="notes-list" data-notes="relationships"></div>
-                <button class="add-note" type="button" data-add="relationships"><span aria-hidden="true">＋</span>Añadir nota</button>
-              </article>
-
-              <article class="canvas-block block-channels" data-key="channels" data-index="06">
-                <header class="block-header">
-                  <span class="block-number">06</span>
-                  <div><h2>Canales</h2><p>Dónde nos descubren, compran y reciben valor.</p></div>
-                </header>
-                <ul class="block-prompts">
-                  <li>¿Qué canales prefiere el cliente?</li>
-                  <li>¿Cuáles funcionan mejor y cómo se conectan?</li>
-                </ul>
-                <div class="notes-list" data-notes="channels"></div>
-                <button class="add-note" type="button" data-add="channels"><span aria-hidden="true">＋</span>Añadir nota</button>
-              </article>
-
-              <article class="canvas-block block-segments" data-key="segments" data-index="07">
-                <header class="block-header">
-                  <span class="block-number">07</span>
-                  <div><h2>Segmentos de clientes</h2><p>Las personas u organizaciones a las que servimos.</p></div>
-                </header>
-                <ul class="block-prompts">
-                  <li>¿Para quién creamos valor?</li>
-                  <li>¿Quiénes son los clientes más importantes?</li>
-                </ul>
+                <p class="block-question">¿Quién te va a comprar?</p>
                 <div class="notes-list" data-notes="segments"></div>
                 <button class="add-note" type="button" data-add="segments"><span aria-hidden="true">＋</span>Añadir nota</button>
               </article>
 
-              <article class="canvas-block block-costs" data-key="costs" data-index="08">
+              <article class="canvas-block block-value" data-key="value" data-index="02">
                 <header class="block-header">
-                  <span class="block-number">08</span>
-                  <div><h2>Estructura de costos</h2><p>Los costos más relevantes para operar.</p></div>
+                  <span class="block-number">02</span>
+                  <div><h2>Propuesta de valor</h2></div>
                 </header>
-                <ul class="block-prompts">
-                  <li>¿Qué recursos y actividades concentran el mayor costo?</li>
-                  <li>¿Qué costos son fijos y cuáles variables?</li>
-                </ul>
-                <div class="notes-list" data-notes="costs"></div>
-                <button class="add-note" type="button" data-add="costs"><span aria-hidden="true">＋</span>Añadir nota</button>
+                <p class="block-question">¿Qué problema le estás resolviendo?</p>
+                <div class="notes-list" data-notes="value"></div>
+                <button class="add-note" type="button" data-add="value"><span aria-hidden="true">＋</span>Añadir nota</button>
               </article>
 
-              <article class="canvas-block block-revenue" data-key="revenue" data-index="09">
+              <article class="canvas-block block-channels" data-key="channels" data-index="03">
                 <header class="block-header">
-                  <span class="block-number">09</span>
-                  <div><h2>Fuentes de ingresos</h2><p>Cómo capturamos parte del valor creado.</p></div>
+                  <span class="block-number">03</span>
+                  <div><h2>Canales</h2></div>
                 </header>
-                <ul class="block-prompts">
-                  <li>¿Por qué valor está dispuesto a pagar cada cliente?</li>
-                  <li>¿Cómo paga hoy y qué modalidad preferiría?</li>
-                </ul>
+                <p class="block-question">¿Cómo se va a enterar de que existes?</p>
+                <div class="notes-list" data-notes="channels"></div>
+                <button class="add-note" type="button" data-add="channels"><span aria-hidden="true">＋</span>Añadir nota</button>
+              </article>
+
+              <article class="canvas-block block-relationships" data-key="relationships" data-index="04">
+                <header class="block-header">
+                  <span class="block-number">04</span>
+                  <div><h2>Relaciones con clientes</h2></div>
+                </header>
+                <p class="block-question">¿Cómo harás para que se quede?</p>
+                <div class="notes-list" data-notes="relationships"></div>
+                <button class="add-note" type="button" data-add="relationships"><span aria-hidden="true">＋</span>Añadir nota</button>
+              </article>
+
+              <article class="canvas-block block-revenue" data-key="revenue" data-index="05">
+                <header class="block-header">
+                  <span class="block-number">05</span>
+                  <div><h2>Fuentes de ingresos</h2></div>
+                </header>
+                <p class="block-question">¿Cómo vas a ganar plata?</p>
                 <div class="notes-list" data-notes="revenue"></div>
                 <button class="add-note" type="button" data-add="revenue"><span aria-hidden="true">＋</span>Añadir nota</button>
+              </article>
+
+              <article class="canvas-block block-resources" data-key="resources" data-index="06">
+                <header class="block-header">
+                  <span class="block-number">06</span>
+                  <div><h2>Recursos clave</h2></div>
+                </header>
+                <p class="block-question">¿Qué necesitas para que funcione?</p>
+                <div class="notes-list" data-notes="resources"></div>
+                <button class="add-note" type="button" data-add="resources"><span aria-hidden="true">＋</span>Añadir nota</button>
+              </article>
+
+              <article class="canvas-block block-activities" data-key="activities" data-index="07">
+                <header class="block-header">
+                  <span class="block-number">07</span>
+                  <div><h2>Actividades clave</h2></div>
+                </header>
+                <p class="block-question">¿Qué tienes que hacer sí o sí?</p>
+                <div class="notes-list" data-notes="activities"></div>
+                <button class="add-note" type="button" data-add="activities"><span aria-hidden="true">＋</span>Añadir nota</button>
+              </article>
+
+              <article class="canvas-block block-partners" data-key="partners" data-index="08">
+                <header class="block-header">
+                  <span class="block-number">08</span>
+                  <div><h2>Socios clave</h2></div>
+                </header>
+                <p class="block-question">¿Quiénes te tienen que ayudar?</p>
+                <div class="notes-list" data-notes="partners"></div>
+                <button class="add-note" type="button" data-add="partners"><span aria-hidden="true">＋</span>Añadir nota</button>
+              </article>
+
+              <article class="canvas-block block-costs" data-key="costs" data-index="09">
+                <header class="block-header">
+                  <span class="block-number">09</span>
+                  <div><h2>Estructura de costos</h2></div>
+                </header>
+                <p class="block-question">¿En qué se te va a ir la plata?</p>
+                <div class="notes-list" data-notes="costs"></div>
+                <button class="add-note" type="button" data-add="costs"><span aria-hidden="true">＋</span>Añadir nota</button>
               </article>
             </div>
           </div>
@@ -233,28 +215,33 @@
 
       <section class="content-section" id="componentes" aria-labelledby="components-title">
         <div class="section-heading">
-          <p class="eyebrow">Los nueve componentes</p>
-          <h2 id="components-title">Lee el modelo como un sistema, no como nueve listas</h2>
-          <p>La parte derecha describe el mercado; la izquierda, la operación; el centro conecta ambos mediante la propuesta de valor.</p>
+          <p class="eyebrow">De la idea a la acción</p>
+          <h2 id="components-title">Todo empieza por aterrizar lo que tienes en mente</h2>
         </div>
-        <div class="component-summary">
-          <article class="summary-card market-card">
-            <span>Deseabilidad</span>
-            <h3>¿Quién lo necesita y cómo lo alcanzamos?</h3>
-            <p>Segmentos, relaciones y canales permiten comprobar si existe una necesidad real y accesible.</p>
-            <ul><li>Segmentos de clientes</li><li>Relaciones con clientes</li><li>Canales</li></ul>
+        <div class="idea-steps">
+          <article class="idea-step step-land">
+            <span class="step-icon" aria-hidden="true">💡</span>
+            <h3>Aterriza</h3>
+            <p>Pon lo que tienes en mente en un solo lugar.</p>
           </article>
-          <article class="summary-card value-card">
-            <span>Relevancia</span>
-            <h3>¿Por qué deberían elegirnos?</h3>
-            <p>La propuesta de valor une un problema específico con un beneficio claro y diferenciable.</p>
-            <ul><li>Problema prioritario</li><li>Resultado esperado</li><li>Diferenciación comprobable</li></ul>
+          <article class="idea-step step-build">
+            <span class="step-icon" aria-hidden="true">🧩</span>
+            <h3>Construye</h3>
+            <p>Haz que paso a paso tu idea empiece a encajar.</p>
           </article>
-          <article class="summary-card viability-card">
-            <span>Viabilidad</span>
-            <h3>¿Podemos entregarlo de forma sostenible?</h3>
-            <p>Socios, actividades, recursos, costos e ingresos muestran si el modelo puede operar y sostenerse.</p>
-            <ul><li>Infraestructura del modelo</li><li>Economía del negocio</li><li>Dependencias críticas</li></ul>
+          <article class="idea-step step-feedback">
+            <span class="step-icon" aria-hidden="true">💬</span>
+            <h3>Pide feedback</h3>
+            <p>Conoce qué piensan otros sobre tu idea.</p>
+          </article>
+          <article class="idea-step step-share">
+            <span class="step-icon" aria-hidden="true">🤝</span>
+            <h3>Comparte</h3>
+            <p>Invita a otros emprendedores a empezar también.</p>
+            <button class="whatsapp-button" id="shareWhatsapp" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 11.7a8.5 8.5 0 0 1-12.6 7.5L3.5 20.5l1.3-4.2a8.5 8.5 0 1 1 15.7-4.6Z"/><path d="M8.3 7.6c.2-.4.4-.4.7-.4h.5c.2 0 .4.1.5.4l.8 2c.1.3 0 .5-.2.7l-.7.8c.7 1.4 1.8 2.5 3.3 3.2l.8-1c.2-.2.4-.3.7-.2l2 .9c.3.1.4.3.4.6v.5c0 .3-.1.6-.4.8-.5.5-1.3.8-2 .8-1.2 0-3.3-.7-5.3-2.5-1.6-1.5-2.8-3.5-3-5 0-.7.2-1.3.6-1.6Z"/></svg>
+              Compartir por WhatsApp
+            </button>
           </article>
         </div>
       </section>
@@ -281,7 +268,7 @@
         </div>
         <div class="faq-list">
           <details><summary>¿Mis datos se envían a un servidor?</summary><p>No. El contenido se guarda únicamente en el almacenamiento local de este navegador. Exporta el archivo JSON si quieres conservar una copia o abrirla en otro equipo.</p></details>
-          <details><summary>¿Cómo obtengo un PDF?</summary><p>Selecciona “Exportar PDF” y, en la ventana de impresión, elige “Guardar como PDF”. El lienzo está preparado para imprimirse en orientación horizontal.</p></details>
+          <details><summary>¿Cómo exporto mi canvas?</summary><p>Abre “Exportar” y elige PDF para imprimirlo o PNG para descargarlo como una imagen lista para enviar.</p></details>
           <details><summary>¿Puedo mover una idea a otro bloque?</summary><p>Sí. Arrastra la nota al bloque correcto o usa el selector “Mover a” incluido en cada nota.</p></details>
           <details><summary>¿El lienzo reemplaza un plan de negocio?</summary><p>No. Sirve para formular y revisar la lógica del modelo. Las hipótesis relevantes todavía deben validarse con clientes, costos y datos reales.</p></details>
         </div>
