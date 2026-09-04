@@ -4,16 +4,28 @@
   const STORAGE_KEY = 'canvas-de-negocio.v1';
   const MAX_LOGO_BYTES = 2 * 1024 * 1024;
   const BLOCKS = [
-    ['partners', 'Socios clave'],
-    ['activities', 'Actividades clave'],
-    ['resources', 'Recursos clave'],
-    ['value', 'Propuesta de valor'],
-    ['relationships', 'Relaciones con clientes'],
-    ['channels', 'Canales'],
-    ['segments', 'Segmentos de clientes'],
-    ['costs', 'Estructura de costos'],
-    ['revenue', 'Fuentes de ingresos']
+    ['segments', 'Segmentos de clientes', '¿Quién te va a comprar?', '01'],
+    ['value', 'Propuesta de valor', '¿Qué problema le estás resolviendo?', '02'],
+    ['channels', 'Canales', '¿Cómo se va a enterar de que existes?', '03'],
+    ['relationships', 'Relaciones con clientes', '¿Cómo harás para que se quede?', '04'],
+    ['revenue', 'Fuentes de ingresos', '¿Cómo vas a ganar plata?', '05'],
+    ['resources', 'Recursos clave', '¿Qué necesitas para que funcione?', '06'],
+    ['activities', 'Actividades clave', '¿Qué tienes que hacer sí o sí?', '07'],
+    ['partners', 'Socios clave', '¿Quiénes te tienen que ayudar?', '08'],
+    ['costs', 'Estructura de costos', '¿En qué se te va a ir la plata?', '09']
   ];
+  const BLOCK_META = Object.fromEntries(BLOCKS.map(([key, label, question, number]) => [key, { label, question, number }]));
+  const BLOCK_COLORS = {
+    segments: ['#004f91', '#e6f0ff'],
+    value: ['#d94e80', '#ffedf3'],
+    channels: ['#1684c2', '#eaf6fd'],
+    relationships: ['#829800', '#f4f7dc'],
+    revenue: ['#829800', '#f4f7dc'],
+    resources: ['#e18447', '#fff1e8'],
+    activities: ['#01869f', '#e6f6f8'],
+    partners: ['#004f91', '#e6f0ff'],
+    costs: ['#555b61', '#f0f1f2']
+  };
 
   const emptyNotes = () => Object.fromEntries(BLOCKS.map(([key]) => [key, []]));
   const defaultState = () => ({
@@ -42,7 +54,11 @@
     importButton: document.querySelector('#importButton'),
     importInput: document.querySelector('#importInput'),
     exportJsonButton: document.querySelector('#exportJsonButton'),
+    exportToggle: document.querySelector('#exportToggle'),
+    exportMenu: document.querySelector('#exportMenu'),
     printButton: document.querySelector('#printButton'),
+    pngButton: document.querySelector('#pngButton'),
+    shareWhatsapp: document.querySelector('#shareWhatsapp'),
     resetButton: document.querySelector('#resetButton'),
     resetDialog: document.querySelector('#resetDialog'),
     confirmReset: document.querySelector('#confirmReset'),
@@ -258,20 +274,251 @@
     else elements.logoPreview.removeAttribute('src');
   }
 
-  function download(filename, content, type) {
-    const blob = new Blob([content], { type });
+  function downloadBlob(filename, blob) {
     const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
+    const objectUrl = URL.createObjectURL(blob);
+    link.href = objectUrl;
     link.download = filename;
     document.body.append(link);
     link.click();
     link.remove();
-    window.setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+  }
+
+  function download(filename, content, type) {
+    downloadBlob(filename, new Blob([content], { type }));
   }
 
   function safeFilename() {
     const raw = state.businessName.trim() || 'mi-negocio';
     return raw.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50) || 'mi-negocio';
+  }
+
+  function roundedRect(context, x, y, width, height, radius) {
+    const r = Math.min(radius, width / 2, height / 2);
+    context.beginPath();
+    context.moveTo(x + r, y);
+    context.lineTo(x + width - r, y);
+    context.quadraticCurveTo(x + width, y, x + width, y + r);
+    context.lineTo(x + width, y + height - r);
+    context.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+    context.lineTo(x + r, y + height);
+    context.quadraticCurveTo(x, y + height, x, y + height - r);
+    context.lineTo(x, y + r);
+    context.quadraticCurveTo(x, y, x + r, y);
+    context.closePath();
+  }
+
+  function wrapText(context, text, maxWidth) {
+    const lines = [];
+    const paragraphs = String(text || '').split(/\n/);
+    paragraphs.forEach((paragraph, paragraphIndex) => {
+      const words = paragraph.trim().split(/\s+/).filter(Boolean);
+      if (!words.length) {
+        if (paragraphIndex < paragraphs.length - 1) lines.push('');
+        return;
+      }
+      let line = words.shift();
+      words.forEach((word) => {
+        const candidate = `${line} ${word}`;
+        if (context.measureText(candidate).width <= maxWidth) line = candidate;
+        else {
+          lines.push(line);
+          line = word;
+        }
+      });
+      lines.push(line);
+      if (paragraphIndex < paragraphs.length - 1) lines.push('');
+    });
+    return lines;
+  }
+
+  function drawTextLines(context, lines, x, y, lineHeight, maxLines = lines.length) {
+    const visible = lines.slice(0, maxLines);
+    visible.forEach((line, index) => context.fillText(line, x, y + (index * lineHeight)));
+    return y + (visible.length * lineHeight);
+  }
+
+  function drawExportBlock(context, key, x, y, width, height) {
+    const meta = BLOCK_META[key];
+    const isMono = state.mode === 'mono';
+    const [brandColor, tintColor] = isMono ? ['#515866', '#f0f1f3'] : BLOCK_COLORS[key];
+    const innerX = x + 30;
+    const innerWidth = width - 60;
+
+    context.save();
+    roundedRect(context, x, y, width, height, 16);
+    context.fillStyle = '#ffffff';
+    context.fill();
+    context.strokeStyle = '#cbd5da';
+    context.lineWidth = 2;
+    context.stroke();
+
+    context.fillStyle = brandColor;
+    roundedRect(context, x, y, 10, height, 6);
+    context.fill();
+
+    context.fillStyle = tintColor;
+    roundedRect(context, innerX, y + 27, 58, 48, 10);
+    context.fill();
+    context.fillStyle = brandColor;
+    context.font = '800 20px Barlow, Arial, sans-serif';
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillText(meta.number, innerX + 29, y + 51);
+
+    context.textAlign = 'left';
+    context.textBaseline = 'alphabetic';
+    context.fillStyle = '#222222';
+    context.font = 'italic 800 27px Barlow, Arial, sans-serif';
+    const titleLines = wrapText(context, meta.label, innerWidth - 76);
+    drawTextLines(context, titleLines, innerX + 76, y + 52, 31, 2);
+
+    context.fillStyle = '#4f5f6d';
+    context.font = '600 22px Barlow, Arial, sans-serif';
+    const questionLines = wrapText(context, meta.question, innerWidth);
+    let cursorY = drawTextLines(context, questionLines, innerX, y + 108, 28, 3) + 12;
+
+    const notes = state.notes[key].map((note) => note.text.trim()).filter(Boolean);
+    const bottom = y + height - 28;
+    if (!notes.length) {
+      context.fillStyle = '#8a959f';
+      context.font = 'italic 500 19px Barlow, Arial, sans-serif';
+      context.fillText('Sin ideas añadidas todavía', innerX, cursorY + 14);
+      context.restore();
+      return;
+    }
+
+    context.font = '500 20px Barlow, Arial, sans-serif';
+    context.fillStyle = '#263146';
+    let drawnNotes = 0;
+    for (let noteIndex = 0; noteIndex < notes.length; noteIndex += 1) {
+      const noteLines = wrapText(context, notes[noteIndex], innerWidth - 28);
+      const availableLines = Math.floor((bottom - cursorY - 14) / 25);
+      if (availableLines < 1) break;
+      const visibleLines = noteLines.slice(0, Math.min(noteLines.length, availableLines, 7));
+      if (visibleLines.length < noteLines.length && visibleLines.length) {
+        const lastIndex = visibleLines.length - 1;
+        visibleLines[lastIndex] = `${visibleLines[lastIndex].replace(/[.…]+$/, '')}…`;
+      }
+      context.fillStyle = brandColor;
+      context.beginPath();
+      context.arc(innerX + 4, cursorY + 8, 4, 0, Math.PI * 2);
+      context.fill();
+      context.fillStyle = '#263146';
+      cursorY = drawTextLines(context, visibleLines, innerX + 22, cursorY + 14, 25) + 10;
+      drawnNotes += 1;
+      if (visibleLines.length < noteLines.length) break;
+    }
+
+    if (drawnNotes < notes.length && bottom - cursorY >= 20) {
+      context.fillStyle = brandColor;
+      context.font = '700 18px Barlow, Arial, sans-serif';
+      context.fillText(`+${notes.length - drawnNotes} ideas más`, innerX, Math.min(bottom, cursorY + 12));
+    }
+    context.restore();
+  }
+
+  function loadExportImage(source) {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = reject;
+      image.src = source;
+    });
+  }
+
+  async function exportPng() {
+    elements.pngButton.disabled = true;
+    elements.pngButton.setAttribute('aria-busy', 'true');
+    showToast('Preparando la imagen PNG…');
+
+    try {
+      if (document.fonts?.ready) await document.fonts.ready;
+      const canvas = document.createElement('canvas');
+      canvas.width = 3000;
+      canvas.height = 2000;
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('Canvas no disponible');
+
+      context.fillStyle = '#f5f7f9';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.fillStyle = '#004f91';
+      context.fillRect(0, 0, canvas.width, 238);
+      context.fillStyle = '#afca0b';
+      context.fillRect(0, 228, canvas.width, 10);
+
+      context.fillStyle = '#ffffff';
+      context.font = 'italic 800 56px Barlow, Arial, sans-serif';
+      context.fillText('BUSINESS MODEL CANVAS', 72, 90);
+      context.fillStyle = '#dcefff';
+      context.font = '600 25px Barlow, Arial, sans-serif';
+      context.fillText(`Idea de Negocio: ${state.businessName.trim() || 'Sin nombre'}`, 72, 146);
+      context.fillText(`Elaborado por: ${state.authorName.trim() || 'Sin indicar'}`, 72, 188);
+
+      if (state.logo) {
+        try {
+          const logo = await loadExportImage(state.logo);
+          const maxWidth = 260;
+          const maxHeight = 130;
+          const scale = Math.min(maxWidth / logo.naturalWidth, maxHeight / logo.naturalHeight, 1);
+          const logoWidth = logo.naturalWidth * scale;
+          const logoHeight = logo.naturalHeight * scale;
+          context.fillStyle = '#ffffff';
+          roundedRect(context, canvas.width - logoWidth - 102, 42, logoWidth + 44, logoHeight + 30, 12);
+          context.fill();
+          context.drawImage(logo, canvas.width - logoWidth - 80, 57, logoWidth, logoHeight);
+        } catch { /* El resto del canvas se exporta aunque el logo no pueda renderizarse. */ }
+      }
+
+      const gridX = 60;
+      const gridY = 268;
+      const gridWidth = canvas.width - 120;
+      const gridHeight = canvas.height - gridY - 56;
+      const columnWidth = gridWidth / 5;
+      const topRowHeight = (gridHeight * 0.69) / 2;
+      const bottomHeight = gridHeight - (topRowHeight * 2);
+      const gap = 7;
+      const cell = (key, column, row, columnSpan = 1, rowSpan = 1) => {
+        const x = gridX + (column * columnWidth) + (gap / 2);
+        const y = gridY + (row * topRowHeight) + (gap / 2);
+        const width = (columnWidth * columnSpan) - gap;
+        const height = (topRowHeight * rowSpan) - gap;
+        drawExportBlock(context, key, x, y, width, height);
+      };
+
+      cell('partners', 0, 0, 1, 2);
+      cell('activities', 1, 0);
+      cell('resources', 1, 1);
+      cell('value', 2, 0, 1, 2);
+      cell('relationships', 3, 0);
+      cell('channels', 3, 1);
+      cell('segments', 4, 0, 1, 2);
+      drawExportBlock(context, 'costs', gridX + (gap / 2), gridY + (topRowHeight * 2) + (gap / 2), (gridWidth / 2) - gap, bottomHeight - gap);
+      drawExportBlock(context, 'revenue', gridX + (gridWidth / 2) + (gap / 2), gridY + (topRowHeight * 2) + (gap / 2), (gridWidth / 2) - gap, bottomHeight - gap);
+
+      const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+      if (!blob) throw new Error('No se pudo generar la imagen');
+      downloadBlob(`canvas-${safeFilename()}.png`, blob);
+      showToast('Imagen PNG descargada.');
+    } catch {
+      showToast('No se pudo crear el PNG en este navegador.');
+    } finally {
+      elements.pngButton.disabled = false;
+      elements.pngButton.removeAttribute('aria-busy');
+    }
+  }
+
+  function setExportMenu(open) {
+    elements.exportMenu.hidden = !open;
+    elements.exportToggle.setAttribute('aria-expanded', String(open));
+  }
+
+  function shareOnWhatsApp() {
+    const pageUrl = new URL(window.location.href);
+    pageUrl.hash = '';
+    const message = `🚀 *Oye 👋 estoy usando esta herramienta para ordenar mi idea de negocio y pensé en ti 😊*\n\nSi estás emprendiendo o tienes una idea, creo que te puede servir 🚀\n\nTe la paso por aquí: ${pageUrl.href}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
   }
 
   function hydrate() {
@@ -359,7 +606,27 @@
     }
   });
 
-  elements.printButton.addEventListener('click', () => window.print());
+  elements.exportToggle.addEventListener('click', (event) => {
+    event.stopPropagation();
+    setExportMenu(elements.exportMenu.hidden);
+  });
+  elements.exportMenu.addEventListener('click', (event) => event.stopPropagation());
+  document.addEventListener('click', () => setExportMenu(false));
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      setExportMenu(false);
+      elements.exportToggle.focus();
+    }
+  });
+  elements.printButton.addEventListener('click', () => {
+    setExportMenu(false);
+    window.print();
+  });
+  elements.pngButton.addEventListener('click', () => {
+    setExportMenu(false);
+    exportPng();
+  });
+  elements.shareWhatsapp.addEventListener('click', shareOnWhatsApp);
   elements.resetButton.addEventListener('click', () => elements.resetDialog.showModal());
   elements.confirmReset.addEventListener('click', () => {
     state = defaultState();
